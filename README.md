@@ -28,3 +28,9 @@ npm install
 npm run dev
 ```
 
+## .env (backend)Add commentMore actions
+```
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/feedback-system
+CORS_ORIGIN=http://localhost:5173
+```
