@@ -28,17 +28,3 @@ npm install
 npm run dev
 ```
 
-## API (Backend)
-- POST /api/feedback → submit feedback
-- GET /api/feedback → get all (with filters)
-- GET /api/feedback/:id → get by ID
-- PUT /api/feedback/:id/status → update status
-- DELETE /api/feedback/:id → delete
-- GET /api/feedback/stats → get stats
-
-## .env (backend)
-```
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/feedback-system
-CORS_ORIGIN=http://localhost:5173
-```
