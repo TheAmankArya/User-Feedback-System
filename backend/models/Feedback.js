@@ -46,7 +46,7 @@ const feedbackSchema = new mongoose.Schema({
     default: Date.now
   }
 }, {
-  timestamps: true, // This adds createdAt and updatedAt fields
+  timestamps: true,
   toJSON: {
     transform: function(doc, ret) {
       ret.id = ret._id;
@@ -57,21 +57,18 @@ const feedbackSchema = new mongoose.Schema({
   }
 });
 
-// Add indexes for better query performance
 feedbackSchema.index({ category: 1 });
 feedbackSchema.index({ status: 1 });
 feedbackSchema.index({ timestamp: -1 });
 feedbackSchema.index({ email: 1 });
 feedbackSchema.index({ createdAt: -1 });
 
-// Add text index for search functionality
 feedbackSchema.index({
   userName: 'text',
   email: 'text',
   feedbackText: 'text'
 });
 
-// Instance method to format the feedback for response
 feedbackSchema.methods.toResponse = function() {
   const obj = this.toObject();
   obj.id = obj._id;
@@ -80,7 +77,6 @@ feedbackSchema.methods.toResponse = function() {
   return obj;
 };
 
-// Static method to get statistics
 feedbackSchema.statics.getStats = async function() {
   const stats = await this.aggregate([
     {
@@ -103,7 +99,6 @@ feedbackSchema.statics.getStats = async function() {
     }
   ]);
 
-  // Get category breakdown
   const categoryStats = await this.aggregate([
     {
       $group: {
@@ -113,7 +108,6 @@ feedbackSchema.statics.getStats = async function() {
     }
   ]);
 
-  // Get status breakdown
   const statusStats = await this.aggregate([
     {
       $group: {
@@ -123,7 +117,6 @@ feedbackSchema.statics.getStats = async function() {
     }
   ]);
 
-  // Get recent activity
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -164,4 +157,4 @@ feedbackSchema.statics.getStats = async function() {
 
 const Feedback = mongoose.model('Feedback', feedbackSchema);
 
-module.exports = Feedback; 
+module.exports = Feedback;

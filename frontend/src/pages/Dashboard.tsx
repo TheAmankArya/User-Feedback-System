@@ -1,62 +1,62 @@
 import { useState, useMemo, useEffect } from 'react';
-import type { Feedback, FeedbackFilters } from '../types/feedback';
-import FeedbackCard from '../components/FeedbackCard';
+import type { UserResponse, ResponseFilters } from '../types/feedback';
+import ResponseCard from '../components/ResponseCard';
 import { Search, Filter, SortDesc, BarChart } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:4444';
 
-const Dashboard = () => {
-    const [filters, setFilters] = useState<FeedbackFilters>({
+const UserDashboard = () => {
+    const [filters, setFilters] = useState<ResponseFilters>({
         category: '',
         status: '',
         sortBy: 'newest',
         searchTerm: ''
     });
 
-    const [feedback, setFeedback] = useState<Feedback[]>([]);
+    const [responses, setResponses] = useState<UserResponse[]>([]);
 
     useEffect(() => {
-        const fetchFeedback = async () => {
+        const fetchResponses = async () => {
             try {
-                const res = await fetch(`${API_BASE}/api/feedback?limit=100&page=1&sortBy=newest`);
+                const res = await fetch(`${API_BASE}/api/user-response?limit=100&page=1&sortBy=newest`);
                 const json = await res.json();
                 if (json.success) {
-                    setFeedback(json.data.feedback);
+                    setResponses(json.data.responses);
                 }
             } catch (err) {
-                console.error('Failed to fetch feedback', err);
+                console.error('Failed to fetch responses', err);
             }
         };
-        fetchFeedback();
+        fetchResponses();
     }, []);
 
-    const handleFilterChange = (key: keyof FeedbackFilters, value: string) => {
+    const handleFilterChange = (key: keyof ResponseFilters, value: string) => {
         setFilters(prev => ({
             ...prev,
             [key]: value
         }));
     };
 
-    const filteredAndSortedFeedback = useMemo(() => {
-        let filtered = [...feedback];
+    const filteredAndSortedResponses = useMemo(() => {
+        let filtered = [...responses];
 
         // Apply category filter
         if (filters.category) {
-            filtered = filtered.filter(feedback => feedback.category === filters.category);
+            filtered = filtered.filter(response => response.category === filters.category);
         }
 
         // Apply status filter
         if (filters.status) {
-            filtered = filtered.filter(feedback => feedback.status === filters.status);
+            filtered = filtered.filter(response => response.status === filters.status);
         }
 
         // Apply search filter
         if (filters.searchTerm) {
             const searchLower = filters.searchTerm.toLowerCase();
-            filtered = filtered.filter(feedback =>
-                feedback.userName.toLowerCase().includes(searchLower) ||
-                feedback.email.toLowerCase().includes(searchLower) ||
-                feedback.feedbackText.toLowerCase().includes(searchLower)
+            filtered = filtered.filter(response =>
+                response.userName.toLowerCase().includes(searchLower) ||
+                response.email.toLowerCase().includes(searchLower) ||
+                response.responseText.toLowerCase().includes(searchLower)
             );
         }
 
@@ -75,16 +75,16 @@ const Dashboard = () => {
         });
 
         return filtered;
-    }, [filters, feedback]);
+    }, [filters, responses]);
 
     const getCategoryStats = () => {
-        const stats = feedback.reduce((acc, feedback) => {
-            acc[feedback.category] = (acc[feedback.category] || 0) + 1;
+        const stats = responses.reduce((acc, response) => {
+            acc[response.category] = (acc[response.category] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
 
         return {
-            total: feedback.length,
+            total: responses.length,
             suggestions: stats['suggestion'] || 0,
             bugReports: stats['bug-report'] || 0,
             featureRequests: stats['feature-request'] || 0,
@@ -99,9 +99,9 @@ const Dashboard = () => {
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Feedback Dashboard</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">User Response Dashboard</h1>
                     <p className="text-gray-600">
-                        Monitor and manage all user feedback submissions
+                        Monitor and manage all user responses
                     </p>
                 </div>
 
@@ -111,7 +111,7 @@ const Dashboard = () => {
                         <div className="flex items-center">
                             <BarChart className="w-8 h-8 text-blue-500" />
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-600">Total Feedback</p>
+                                <p className="text-sm font-medium text-gray-600">Total Responses</p>
                                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
                             </div>
                         </div>
@@ -159,7 +159,7 @@ const Dashboard = () => {
                                 <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
                                 <input
                                     type="text"
-                                    placeholder="Search feedback..."
+                                    placeholder="Search responses..."
                                     value={filters.searchTerm || ''}
                                     onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
                                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -226,25 +226,25 @@ const Dashboard = () => {
                 {/* Results */}
                 <div className="mb-4 flex justify-between items-center">
                     <p className="text-gray-600">
-                        Showing {filteredAndSortedFeedback.length} of {feedback.length} feedback items
+                        Showing {filteredAndSortedResponses.length} of {responses.length} response items
                     </p>
                 </div>
 
-                {/* Feedback List */}
-                {filteredAndSortedFeedback.length === 0 ? (
+                {/* Response List */}
+                {filteredAndSortedResponses.length === 0 ? (
                     <div className="bg-white rounded-lg shadow-sm border p-12 text-center">
                         <div className="text-gray-400 mb-4">
                             <Search className="w-12 h-12 mx-auto" />
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No feedback found</h3>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No responses found</h3>
                         <p className="text-gray-600">
                             Try adjusting your filters or search terms to find more results.
                         </p>
                     </div>
                 ) : (
                     <div className="space-y-6">
-                        {filteredAndSortedFeedback.map(feedback => (
-                            <FeedbackCard key={feedback.id} feedback={feedback} />
+                        {filteredAndSortedResponses.map(response => (
+                            <ResponseCard key={response.id} response={response} />
                         ))}
                     </div>
                 )}
@@ -253,4 +253,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard; 
+export default UserDashboard;

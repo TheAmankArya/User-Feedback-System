@@ -1,21 +1,21 @@
-export interface Feedback {
+export interface UserResponse {
   id: string;
   userName: string;
   email: string;
-  feedbackText: string;
+  responseText: string;
   category: "suggestion" | "bug-report" | "feature-request" | "general";
   timestamp: string;
   status?: "pending" | "reviewed" | "resolved";
 }
 
-export interface FeedbackFormData {
+export interface UserResponseForm {
   userName: string;
   email: string;
-  feedbackText: string;
+  responseText: string;
   category: "suggestion" | "bug-report" | "feature-request" | "general";
 }
 
-export interface FeedbackFilters {
+export interface ResponseFilters {
   category?: string;
   status?: string;
   sortBy: "newest" | "oldest" | "category";

@@ -1,9 +1,6 @@
 const Feedback = require('../models/Feedback');
 const { asyncHandler } = require('../middleware/errorHandler');
 
-// @desc    Create new feedback
-// @route   POST /api/feedback
-// @access  Public
 const createFeedback = asyncHandler(async (req, res) => {
   const { userName, email, feedbackText, category } = req.body;
 
@@ -23,16 +20,12 @@ const createFeedback = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get all feedback with filtering and pagination
-// @route   GET /api/feedback
-// @access  Public
 const getAllFeedback = asyncHandler(async (req, res) => {
   const { category, status, sortBy, search, page, limit } = req.query;
 
-  // Build query
+
   let query = {};
 
-  // Apply filters
   if (category) {
     query.category = category;
   }
@@ -41,7 +34,6 @@ const getAllFeedback = asyncHandler(async (req, res) => {
     query.status = status;
   }
 
-  // Apply search
   if (search) {
     query.$or = [
       { userName: { $regex: search, $options: 'i' } },
@@ -50,7 +42,6 @@ const getAllFeedback = asyncHandler(async (req, res) => {
     ];
   }
 
-  // Build sort criteria
   let sort = {};
   switch (sortBy) {
     case 'oldest':
@@ -65,10 +56,8 @@ const getAllFeedback = asyncHandler(async (req, res) => {
       break;
   }
 
-  // Calculate pagination
   const skip = (page - 1) * limit;
 
-  // Execute queries in parallel
   const [feedback, totalCount, stats] = await Promise.all([
     Feedback.find(query)
       .sort(sort)
@@ -79,7 +68,6 @@ const getAllFeedback = asyncHandler(async (req, res) => {
     Feedback.getStats()
   ]);
 
-  // Calculate pagination info
   const totalPages = Math.ceil(totalCount / limit);
   const hasNextPage = page < totalPages;
   const hasPrevPage = page > 1;
@@ -106,9 +94,6 @@ const getAllFeedback = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get feedback by ID
-// @route   GET /api/feedback/:id
-// @access  Public
 const getFeedbackById = asyncHandler(async (req, res) => {
   const feedback = await Feedback.findById(req.params.id);
 
@@ -125,9 +110,6 @@ const getFeedbackById = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Update feedback status
-// @route   PUT /api/feedback/:id/status
-// @access  Admin (for now public, can be protected later)
 const updateFeedbackStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
 
@@ -153,9 +135,6 @@ const updateFeedbackStatus = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Delete feedback
-// @route   DELETE /api/feedback/:id
-// @access  Admin (for now public, can be protected later)
 const deleteFeedback = asyncHandler(async (req, res) => {
   const feedback = await Feedback.findById(req.params.id);
 
@@ -174,9 +153,6 @@ const deleteFeedback = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get feedback statistics
-// @route   GET /api/feedback/stats
-// @access  Public
 const getFeedbackStats = asyncHandler(async (req, res) => {
   const stats = await Feedback.getStats();
 
@@ -186,9 +162,6 @@ const getFeedbackStats = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Bulk update feedback status
-// @route   PUT /api/feedback/bulk-status
-// @access  Admin
 const bulkUpdateStatus = asyncHandler(async (req, res) => {
   const { ids, status } = req.body;
 
@@ -221,9 +194,6 @@ const bulkUpdateStatus = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get feedback by email
-// @route   GET /api/feedback/user/:email
-// @access  Public
 const getFeedbackByEmail = asyncHandler(async (req, res) => {
   const { email } = req.params;
   const { page = 1, limit = 10 } = req.query;
@@ -276,4 +246,4 @@ module.exports = {
   getFeedbackStats,
   bulkUpdateStatus,
   getFeedbackByEmail
-}; 
+};

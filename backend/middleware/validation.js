@@ -1,6 +1,5 @@
 const Joi = require('joi');
 
-// Validation schemas
 const feedbackSchema = Joi.object({
   userName: Joi.string()
     .trim()
@@ -13,7 +12,6 @@ const feedbackSchema = Joi.object({
       'string.max': 'User name cannot exceed 100 characters',
       'any.required': 'User name is required'
     }),
-  
   email: Joi.string()
     .email()
     .trim()
@@ -23,7 +21,6 @@ const feedbackSchema = Joi.object({
       'string.empty': 'Email is required',
       'any.required': 'Email is required'
     }),
-  
   feedbackText: Joi.string()
     .trim()
     .min(10)
@@ -35,7 +32,6 @@ const feedbackSchema = Joi.object({
       'string.max': 'Feedback text cannot exceed 1000 characters',
       'any.required': 'Feedback text is required'
     }),
-  
   category: Joi.string()
     .valid('suggestion', 'bug-report', 'feature-request', 'general')
     .required()
@@ -59,25 +55,20 @@ const querySchema = Joi.object({
   category: Joi.string()
     .valid('suggestion', 'bug-report', 'feature-request', 'general')
     .optional(),
-  
   status: Joi.string()
     .valid('pending', 'reviewed', 'resolved')
     .optional(),
-  
   sortBy: Joi.string()
     .valid('newest', 'oldest', 'category')
     .default('newest'),
-  
   search: Joi.string()
     .trim()
     .max(200)
     .optional(),
-  
   page: Joi.number()
     .integer()
     .min(1)
     .default(1),
-  
   limit: Joi.number()
     .integer()
     .min(1)
@@ -85,53 +76,44 @@ const querySchema = Joi.object({
     .default(10)
 });
 
-// Validation middleware factory
 const validate = (schema, property = 'body') => {
   return (req, res, next) => {
     const { error } = schema.validate(req[property], {
-      abortEarly: false, // Return all validation errors
-      stripUnknown: true, // Remove unknown fields
-      convert: true // Convert string numbers to numbers
+      abortEarly: false,
+      stripUnknown: true,
+      convert: true
     });
-
     if (error) {
       const errors = error.details.map(detail => ({
         field: detail.path.join('.'),
         message: detail.message
       }));
-
       return res.status(400).json({
         success: false,
         message: 'Validation error',
         errors
       });
     }
-
-    // Update the request with validated and sanitized data
     req[property] = error ? req[property] : schema.validate(req[property]).value;
     next();
   };
 };
 
-// Middleware for validating MongoDB ObjectId
 const validateObjectId = (paramName = 'id') => {
   return (req, res, next) => {
     const id = req.params[paramName];
-    
     if (!id) {
       return res.status(400).json({
         success: false,
         message: `${paramName} parameter is required`
       });
     }
-    
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid ID format'
       });
     }
-    
     next();
   };
 };
@@ -141,4 +123,4 @@ module.exports = {
   validateStatusUpdate: validate(statusUpdateSchema),
   validateQuery: validate(querySchema, 'query'),
   validateObjectId
-}; 
+};

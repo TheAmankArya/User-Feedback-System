@@ -63,26 +63,20 @@ const seedData = [
 const seedDatabase = async () => {
   try {
     await connectDB();
-    
-    // Clear existing data
     await Feedback.deleteMany({});
-    console.log('🗑️  Cleared existing feedback data');
-    
-    // Insert seed data
+    console.log('Cleared existing feedback data');
     const insertedData = await Feedback.insertMany(seedData);
-    console.log(`✅ Inserted ${insertedData.length} feedback records`);
-    
-    console.log('🌱 Database seeded successfully!');
+    console.log(`Inserted ${insertedData.length} feedback records`);
+    console.log('Database seeded successfully!');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error seeding database:', error);
+    console.error('Error seeding database:', error);
     process.exit(1);
   }
 };
 
-// Run seeding if called directly
 if (require.main === module) {
   seedDatabase();
 }
 
-module.exports = { seedData, seedDatabase }; 
+module.exports = { seedData, seedDatabase };

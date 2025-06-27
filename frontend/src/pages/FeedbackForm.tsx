@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import type { FeedbackFormData } from '../types/feedback';
+import type { UserResponseForm } from '../types/feedback';
 import { Send, CheckCircle } from 'lucide-react';
 
-const FeedbackForm = () => {
-    const [formData, setFormData] = useState<FeedbackFormData>({
+const ResponseForm = () => {
+    const [formData, setFormData] = useState<UserResponseForm>({
         userName: '',
         email: '',
-        feedbackText: '',
+        responseText: '',
         category: 'general'
     });
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -25,7 +25,7 @@ const FeedbackForm = () => {
         setIsSubmitting(true);
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL ?? 'http://localhost:4444'}/api/feedback`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL ?? 'http://localhost:4444'}/api/user-response`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -36,11 +36,11 @@ const FeedbackForm = () => {
             const json = await res.json();
 
             if (!json.success) {
-                throw new Error(json.message || 'Failed to submit feedback');
+                throw new Error(json.message || 'Failed to submit response');
             }
         } catch (err) {
             console.error(err);
-            alert('Failed to submit feedback, please try again.');
+            alert('Failed to submit response, please try again.');
             setIsSubmitting(false);
             return;
         }
@@ -48,13 +48,12 @@ const FeedbackForm = () => {
         setIsSubmitted(true);
         setIsSubmitting(false);
 
-        // Reset form after 3 seconds
         setTimeout(() => {
             setIsSubmitted(false);
             setFormData({
                 userName: '',
                 email: '',
-                feedbackText: '',
+                responseText: '',
                 category: 'general'
             });
         }, 3000);
@@ -68,7 +67,7 @@ const FeedbackForm = () => {
                         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h2>
                         <p className="text-gray-600 mb-4">
-                            Your feedback has been successfully submitted. We appreciate your input and will review it shortly.
+                            Your response has been successfully submitted. We appreciate your input and will review it shortly.
                         </p>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                             <div className="bg-green-500 h-2 rounded-full animate-pulse" style={{ width: '100%' }}></div>
@@ -85,7 +84,7 @@ const FeedbackForm = () => {
             <div className="max-w-2xl mx-auto">
                 <div className="bg-white rounded-lg shadow-md p-8">
                     <div className="mb-8">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Share Your Feedback</h2>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Share Your Response</h2>
                         <p className="text-gray-600">
                             We value your opinion! Please share your thoughts, suggestions, or report any issues you've encountered.
                         </p>
@@ -146,21 +145,21 @@ const FeedbackForm = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="feedbackText" className="block text-sm font-medium text-gray-700 mb-2">
-                                Your Feedback *
+                            <label htmlFor="responseText" className="block text-sm font-medium text-gray-700 mb-2">
+                                Your Response *
                             </label>
                             <textarea
-                                id="feedbackText"
-                                name="feedbackText"
+                                id="responseText"
+                                name="responseText"
                                 required
                                 rows={6}
-                                value={formData.feedbackText}
+                                value={formData.responseText}
                                 onChange={handleChange}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                placeholder="Please share your detailed feedback, suggestions, or describe any issues you've encountered..."
+                                placeholder="Please share your detailed response, suggestions, or describe any issues you've encountered..."
                             />
                             <div className="mt-2 text-sm text-gray-500">
-                                {formData.feedbackText.length}/1000 characters
+                                {formData.responseText.length}/1000 characters
                             </div>
                         </div>
 
@@ -178,7 +177,7 @@ const FeedbackForm = () => {
                                 ) : (
                                     <>
                                         <Send className="w-4 h-4 mr-2" />
-                                        Submit Feedback
+                                        Submit Response
                                     </>
                                 )}
                             </button>
@@ -190,4 +189,4 @@ const FeedbackForm = () => {
     );
 };
 
-export default FeedbackForm; 
+export default ResponseForm;

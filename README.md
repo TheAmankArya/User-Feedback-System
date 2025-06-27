@@ -28,7 +28,8 @@ npm install
 npm run dev
 ```
 
-## .env (backend)Add commentMore actions
+
+## .env (backend)
 ```
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/feedback-system
